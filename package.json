@@ -1,5 +1,5 @@
 {
-  "name": "fengari-demo",
+  "name": "json-lua-converter",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -17,11 +17,14 @@
     "@mantine/modals": "^6.0.15",
     "@mantine/notifications": "^6.0.15",
     "@mantine/prism": "^6.0.15",
+    "@monaco-editor/react": "^4.5.1",
     "axios": "^1.4.0",
     "dayjs": "^1.11.9",
     "fengari-web": "^0.1.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^4.10.1",
+    "react-router-dom": "^6.14.1",
     "react-use": "^17.4.0"
   },
   "devDependencies": {
