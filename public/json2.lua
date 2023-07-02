@@ -1,3 +1,19 @@
+--[[
+Custom JSON Serialization Module that handles DCS' usage of integers as table keys such as {[1]=1, ["name"]="Enfield11", [2]=1, [3]=1} which is not valid json
+
+This is handled by encoding tables with mixed key types as objects so the above example would be
+
+{
+  "_1": 1,
+  "_2": 1,
+  "name": "Enfield11",
+  "_3": 1
+}
+
+Anything that is clearly a table is still converted to a table
+
+]]--
+
 json = { _version = "0.1.2" }
 
 -------------------------------------------------------------------------------
@@ -31,6 +47,35 @@ local function encode_nil(val)
   return "null"
 end
 
+--- Checks if a given table is an array.
+-- The function verifies that all keys are numeric and sequential starting from 1.
+-- @param val Table to be checked.
+-- @return boolean Returns true if the table is an array, otherwise false.
+local function is_table_array(val)
+  -- Check if the first element of the table is not nil or the table is empty.
+  -- These are two signs that the table might be an array.
+  if rawget(val, 1) ~= nil or next(val) == nil then
+    -- Initialize a counter to track the current index.
+    local n = 0
+    -- Iterate over every key-value pair in the table.
+    for k, v in pairs(val) do
+      -- Increment the index counter.
+      n = n + 1
+      -- Check if the current key is not a number or if it's not the expected index.
+      -- If either of these is true, then the table is not a sequentially indexed array.
+      if type(k) ~= "number" or n ~= k then
+        return false
+      end
+    end
+    -- If all keys were numeric and in sequence, then the table is an array.
+    return true
+  else
+    -- If the first element of the table is nil and the table isn't empty,
+    -- then it's not an array.
+    return false
+  end
+end
+
 
 local function encode_table(val, stack)
   local res = {}
@@ -41,6 +86,19 @@ local function encode_table(val, stack)
 
   stack[val] = true
 
+
+
+  if is_table_array(val) then
+    -- Treat as array -- check keys are valid and it is not sparse
+    -- Encode
+    for i, v in ipairs(val) do
+      table.insert(res, encode(v, stack))
+    end
+    stack[val] = nil
+    return "[" .. table.concat(res, ",") .. "]"
+
+  else
+    -- Treat as an object
     for k, v in pairs(val) do
       if type(k) ~= "string" then
         table.insert(res, encode("_"..k, stack) .. ":" .. encode(v, stack))
@@ -50,6 +108,7 @@ local function encode_table(val, stack)
     end
     stack[val] = nil
     return "{" .. table.concat(res, ",") .. "}"
+  end
 end
 
 
