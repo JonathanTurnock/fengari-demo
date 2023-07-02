@@ -53,7 +53,13 @@ const AppHeader: React.FC = () => {
           </Group>
           <Group>
             <Tooltip label="Source Code">
-              <ActionIcon variant={"default"} size={"lg"}>
+              <ActionIcon
+                variant={"default"}
+                size={"lg"}
+                onClick={() =>
+                  window.open("https://github.com/JonathanTurnock/json-lua")
+                }
+              >
                 <AiFillGithub size="1.5rem" />
               </ActionIcon>
             </Tooltip>
